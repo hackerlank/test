@@ -9,6 +9,7 @@
 
 #include "../common/console.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -117,8 +118,10 @@ int CTestMsgServerDlg::InitNetWork()
 
 			continue;  
 		}  
-
-		send(sClient, szText, strlen(szText), 0);  
+		static int i = 0;
+		
+		string rtMsg = avar("»¶Ó­Äú£¬¿Í»§¶Ë%d\n", ++i);
+		send(sClient, rtMsg.c_str(), strlen(rtMsg.c_str()), 0);  
 
 		closesocket(sClient);   
 

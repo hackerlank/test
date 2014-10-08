@@ -10,6 +10,7 @@
 #define ConsoleOut console::Manager::GetInstance()->Output
 #define ConsoleOutEx console::Manager::GetInstance()->OutputEx
 
+const char* avar(const char* pszFmt, ...);
 
 namespace console
 {

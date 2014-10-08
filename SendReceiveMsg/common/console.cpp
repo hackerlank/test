@@ -7,6 +7,19 @@
 // #define new DEBUG_NEW
 // #endif
 
+const char* avar(const char* pszFmt, ...)
+{
+	__declspec( thread ) static char szBuffer[1024];
+	va_list ap;
+	va_start(ap, pszFmt);
+
+	_vsnprintf_s(szBuffer, 1024, pszFmt, ap);
+	szBuffer[1023] = 0;
+
+	va_end ( ap );
+	return szBuffer;
+}
+
 namespace console
 {
 // 	const DWORD COLORSET[] = 
@@ -207,11 +220,22 @@ namespace console
 		_vsnprintf_s((char*)szTextBuffer, 2047, 2047, (const char*)szFormatString, vapt);
 		va_end(vapt);
 
+		time_t ti = time(NULL);
+		tm* t = localtime(&ti);
+		char szTime[MAX_PATH] = {0};
+		strftime(szTime, MAX_PATH, "[%y-%m-%d %H:%M:%S] ", t);
+
 		if (m_pWin32Con)
+		{
+			m_pWin32Con->Output(CONSOLE_COLOR_DEFAULT, szTime);
 			m_pWin32Con->Output(CONSOLE_COLOR_DEFAULT, szTextBuffer);
+		}
 
 		if (m_pFileLog)
+		{
+			m_pFileLog->Output(szTime);
 			m_pFileLog->Output(szFormatString);
+		}
 
 	}
 
@@ -230,10 +254,22 @@ namespace console
 		_vsnprintf_s((char*)szTextBuffer, 2047, 2047, (const char*)szFormatString, vapt);
 		va_end(vapt);
 
+
+		time_t ti = time(NULL);
+		tm* t = localtime(&ti);
+		char szTime[MAX_PATH] = {0};
+		strftime(szTime, MAX_PATH, "[%y-%m-%d %H:%M:%S] ", t);
+
 		if (m_pWin32Con)
+		{
+			m_pWin32Con->Output(dwColor, szTime);
 			m_pWin32Con->Output(dwColor, szTextBuffer);
+		}
 
 		if (m_pFileLog)
+		{
+			m_pFileLog->Output(szTime);
 			m_pFileLog->Output(szTextBuffer);
+		}
 	}
 }
