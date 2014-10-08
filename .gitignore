@@ -8,7 +8,7 @@ proj.wp8-xaml/
 .settings/
 bin/
 gen/
-
+debug/
  
 ###################  
 *.exe
@@ -30,6 +30,17 @@ gen/
 *.so
 .DS_Store
 ._.DS_Store
+*.ilk
+*.pdb
+*.tlog
+*.manifest
+*.obj
+*.pch
+*.idb
+*.suo
+*.sdf
+*.aps
+
 
 
 
