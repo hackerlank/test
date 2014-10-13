@@ -39,6 +39,4 @@ public:
 	CString m_sendTxt;
 	afx_msg void OnEnChangeEdit1();
 	CEdit m_editCtrol;
-	afx_msg void OnBnClickedButton2();
-	afx_msg void OnBnClickedButton3();
 };

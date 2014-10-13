@@ -150,8 +150,6 @@ BEGIN_MESSAGE_MAP(CTestMsgClientDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CTestMsgClientDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDOK, &CTestMsgClientDlg::OnBnClickedOk)
 	ON_EN_CHANGE(IDC_EDIT1, &CTestMsgClientDlg::OnEnChangeEdit1)
-	ON_BN_CLICKED(IDC_BUTTON2, &CTestMsgClientDlg::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CTestMsgClientDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -300,17 +298,4 @@ void CTestMsgClientDlg::OnEnChangeEdit1()
 }
 
 
-void CTestMsgClientDlg::OnBnClickedButton2()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	stServerReturnLoginSuccessCmd cmd;
-	SEND_USER_CMD(cmd);
-}
 
-
-void CTestMsgClientDlg::OnBnClickedButton3()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	stUserRequestLoginCmd cmd;
-	SEND_USER_CMD(cmd);
-}

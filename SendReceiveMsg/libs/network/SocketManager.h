@@ -64,8 +64,7 @@ private:
 	CEncrypt* m_pEncrypt;
 	
 	bool m_bShowCmdSrcret;
-	bool m_bLoginSend;
-	bool m_bLoginRecv;
+
 
 	std::vector<BYTE> m_uncompressBuffer;
 	std::vector<BYTE> m_dataBuffer;
@@ -75,6 +74,11 @@ private:
 
 	stServerReturnLoginSuccessCmd m_BackCmd;
 public:
+
+	bool m_bLoginSend;
+	bool m_bLoginRecv;
+
+
 	std::list<BYTE> m_key;
 	DWORD m_dwEncryptMask;
 	int m_iLenSended;

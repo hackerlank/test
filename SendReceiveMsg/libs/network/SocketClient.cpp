@@ -368,9 +368,15 @@ bool SocketClient::connectServer()
 		}
 		SocketManager::getInstance()->m_dwEncryptMask = DWORD(pKeyData[2]);
 
+
+		SocketManager::getInstance()->m_bLoginRecv = false;
+		SocketManager::getInstance()->m_bLoginSend = true;
+		
 		//发送游戏版本号
 		stUserVerifyVerCmd cmd;
 		cmd.version = 2014092901;
+		//cmd.dwTimestamp = 0;
+		//SocketManager::getInstance()->send((char*)(&cmd), sizeof(stUserVerifyVerCmd));
 		SEND_USER_CMD(cmd);
 
 		//=================================================
@@ -383,7 +389,12 @@ bool SocketClient::connectServer()
 		strncpy(cmd1.pstrPassword, "", sizeof(cmd1.pstrPassword));
 		cmd1.pstrPassword[sizeof(cmd1.pstrPassword) - 1] = 0;
 
+		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "#########################");
+		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "UserID: %d, loginTmepID: %d", pCmd->dwUserID, pCmd->loginTempID);
+
 		SEND_USER_CMD(cmd1);
+
+		SocketManager::getInstance()->m_bLoginSend = false;
 
 	}
 	else //登陆服务器

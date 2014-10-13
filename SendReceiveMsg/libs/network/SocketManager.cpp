@@ -3,6 +3,10 @@
 #include "../enc/miniCrypt.h"
 #include "zlib/zlib.h"
 
+//在这里修改登录器IP 端口
+#define LOGIN_SERVER_IP "101.226.182.5"
+#define LOGIN_SERVER_PORT 7000
+
 BYTE key[16] = {0x3f, 0x79, 0xd5, 0xe2, 0x4a, 0x8c, 0xb6, 0xc1, 0xaf, 0x31, 0x5e, 0xc7, 0xeb, 0x9d, 0x6e, 0xcb};
 
 #define PACKET_MAX_SIZE 0x00ffffff
@@ -12,7 +16,7 @@ BYTE key[16] = {0x3f, 0x79, 0xd5, 0xe2, 0x4a, 0x8c, 0xb6, 0xc1, 0xaf, 0x31, 0x5e
 typedef unsigned long tPackLengthType;
 
 #define HAS_ENCRYPT
-//#define _USE_PART_ENCRYPT
+#define _USE_PART_ENCRYPT
 
 static SocketManager* instance = NULL;
 SocketManager::SocketManager()
@@ -33,6 +37,7 @@ SocketManager::SocketManager()
 	m_dwEncryptMask = 0xffff0000;
 	m_iLenSended = 0;
 	m_iLenRecved = 0; 
+	m_nTimeInit = 0;
 }
 
 SocketManager::~SocketManager()
@@ -62,26 +67,7 @@ SocketClient* SocketManager::GetSocketClient()
 
 void SocketManager::startSocket()
 {
-    char IPStr[64]={0};
-    hostent * host_entry=gethostbyname("jiumiaoshanyou3.1251001050.lbs.twsapp.com");
-    
-    if(host_entry !=0){
-        
-        sprintf(IPStr, "%d.%d.%d.%d",(host_entry->h_addr_list[0][0]&0x00ff),
-                
-                (host_entry->h_addr_list[0][1]&0x00ff),
-                
-                (host_entry->h_addr_list[0][2]&0x00ff),
-                
-                (host_entry->h_addr_list[0][3]&0x00ff));
-        
-    }
-    CCLog("%s",IPStr);
-    CCLog("--------------------------");
-
-	_socket = new SocketClient("101.226.182.5",7000,1,1,NULL);
-//	_socket = new SocketClient("127.0.0.1",1234,1,1,NULL);
-
+	_socket = new SocketClient(LOGIN_SERVER_IP,LOGIN_SERVER_PORT,1,1,NULL);
 
 	_socket->start();
 }
@@ -201,6 +187,14 @@ void SocketManager::sendMessage(const char* data,int commandId)
 
  bool SocketManager::onRecvData(BYTE* pData, size_t size)
  {
+	 if (GetSocketClient()->m_IsGatewayIP)
+	 {
+		  cout << "break here" << endl;
+	 }
+	 if (!m_bLoginRecv)
+	 {
+		 cout << "break here" << endl;
+	 }
 	 //-----------------------
 	 //读取数据
 	 //-----------------------
@@ -416,8 +410,8 @@ void SocketManager::sendMessage(const char* data,int commandId)
 							 memcpy(&m_BackCmd, pCmd, sizeof(stServerReturnLoginSuccessCmd));
 
 							 //重新连接，本地清理
-							 m_bLoginSend = false;
-							 m_bLoginRecv = false;
+// 							 m_bLoginSend = false;
+// 							 m_bLoginRecv = false;
 							 m_uncompressBuffer.clear();
 							 m_dataBuffer.clear();
 							 m_recvBuffer.clear();
