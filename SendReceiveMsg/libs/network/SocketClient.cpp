@@ -359,14 +359,14 @@ bool SocketClient::connectServer()
 		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "=====connect gateway successed！=====");
 
 		//设置加密的key
-// 		stServerReturnLoginSuccessCmd* pCmd = SocketManager::getInstance()->GetUserInfoCmd();
-// 		BYTE* pKeyData = &pCmd->key[pCmd->keyOffset];
-// 		SocketManager::getInstance()->m_key.clear();
-// 		for (int i=0; i<8; ++i)
-// 		{
-// 			SocketManager::getInstance()->m_key.push_back(pKeyData[i]);
-// 		}
-// 		SocketManager::getInstance()->m_dwEncryptMask = DWORD(pKeyData[2]);
+		stServerReturnLoginSuccessCmd* pCmd = SocketManager::getInstance()->GetUserInfoCmd();
+		BYTE* pKeyData = &pCmd->key[pCmd->keyOffset];
+		SocketManager::getInstance()->m_key.clear();
+		for (int i=0; i<8; ++i)
+		{
+			SocketManager::getInstance()->m_key.push_back(pKeyData[i]);
+		}
+		SocketManager::getInstance()->m_dwEncryptMask = DWORD(pKeyData[2]);
 
 		//发送游戏版本号
 		stUserVerifyVerCmd cmd;
@@ -375,16 +375,15 @@ bool SocketClient::connectServer()
 
 		//=================================================
 		
+		stPasswdLogonUserCmd cmd1;
+		cmd1.dwUserID = pCmd->dwUserID;
+		cmd1.loginTempID = pCmd->loginTempID;
+		strncpy(cmd1.pstrName, "goodluck03@gmail.com", sizeof(cmd1.pstrName));
+		cmd1.pstrName[sizeof(cmd1.pstrName) - 1] = 0;
+		strncpy(cmd1.pstrPassword, "", sizeof(cmd1.pstrPassword));
+		cmd1.pstrPassword[sizeof(cmd1.pstrPassword) - 1] = 0;
 
-// 		stPasswdLogonUserCmd cmd1;
-// 		cmd1.dwUserID = pCmd->dwUserID;
-// 		cmd1.loginTempID = pCmd->loginTempID;
-// 		strncpy(cmd1.pstrName, "goodluck03@gmail.com", sizeof(cmd1.pstrName));
-// 		cmd1.pstrName[sizeof(cmd1.pstrName) - 1] = 0;
-// 		strncpy(cmd1.pstrPassword, "", sizeof(cmd1.pstrPassword));
-// 		cmd1.pstrPassword[sizeof(cmd1.pstrPassword) - 1] = 0;
-// 
-// 		SEND_USER_CMD(cmd1);
+		SEND_USER_CMD(cmd1);
 
 	}
 	else //登陆服务器

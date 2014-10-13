@@ -18,8 +18,8 @@ static SocketManager* instance = NULL;
 SocketManager::SocketManager()
 {
     m_bShowCmdSrcret = true;
-	m_bLoginSend = false;
-	m_bLoginRecv = false;
+	m_bLoginSend = true;
+	m_bLoginRecv = true;
 	m_pEncrypt = new CEncrypt;
 	for (int i=0; i<sizeof(key); ++i)
 	{
@@ -79,8 +79,8 @@ void SocketManager::startSocket()
     CCLog("%s",IPStr);
     CCLog("--------------------------");
 
-//	_socket = new SocketClient("101.226.182.5",7000,1,1,NULL);
-	_socket = new SocketClient("127.0.0.1",1234,1,1,NULL);
+	_socket = new SocketClient("101.226.182.5",7000,1,1,NULL);
+//	_socket = new SocketClient("127.0.0.1",1234,1,1,NULL);
 
 
 	_socket->start();
@@ -422,8 +422,8 @@ void SocketManager::sendMessage(const char* data,int commandId)
 							 m_dataBuffer.clear();
 							 m_recvBuffer.clear();
 							 GetSocketClient()->Destroy();
-							 //GetSocketClient()->ReConnect(pSign->pstrIP, pSign->wdPort);
-							 GetSocketClient()->ReConnect("127.0.0.1", 4567);
+							 GetSocketClient()->ReConnect(pSign->pstrIP, pSign->wdPort);
+							 //GetSocketClient()->ReConnect("127.0.0.1", 4567);
 
 							 //pthread_exit(0);
 

@@ -192,7 +192,7 @@ BOOL CTestMsgClientDlg::OnInitDialog()
 	// 
 	ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "===============TestClient log!=============\n");
 
-	InitNetWork();
+	//InitNetWork();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
