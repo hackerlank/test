@@ -1,6 +1,8 @@
 #ifndef _CDATA_NETSOCKET_H_
 #define _CDATA_NETSOCKET_H_
 
+#define CC_PLATFORM_WIN32 3
+
 #ifdef CC_PLATFORM_WIN32
 
 #include "pthread.h"
@@ -27,7 +29,7 @@
 #include <stdlib.h>
 #include <queue>
 
-#include "cocos2d.h"
+//#include "cocos2d.h"
 #include "ByteBuffer.h"
 const int	SocketClient_WAIT_CONNECT = 0;
 const int	SocketClient_OK = 1;
@@ -66,6 +68,11 @@ public:
 	int m_iState;
 	MessageHandler* m_pHandler;
 	
+
+	//接收线程
+	bool m_bThreadRecvCreatedGateway;
+	pthread_t pthread_t_receive_gateway;
+
 	//接收线程
 	bool m_bThreadRecvCreated;
 	pthread_t pthread_t_receive;
@@ -91,8 +98,11 @@ private:
 	//连接服务器
 	bool  connectServer();
 	
+	static void* ThreadReceiveMessageGateway(void *p);
 	static void* ThreadReceiveMessage(void *p);
 	static void* ThreadSendMessage(void *p);
+
+
 	
 public:
 	SocketClient(String host, int port, byte clientId,
@@ -100,7 +110,12 @@ public:
 	
 	~SocketClient();
 	void start();
+	//void startGateway();
 	void stop(boolean b);
+
+	void Destroy();
+	void ReConnect(String host, int port);
+	bool m_IsGatewayIP;
 	
 	bool isWaitConnect();
 	//发送数据
@@ -120,6 +135,7 @@ public:
 	}
 	
     Message* constructMessage(const char* data,int commandId);
+	Message* constructZtMessage(const char* data, int sendsize);
     static int bytesToInt(byte* data);
     static byte* intToByte(int i);
     void swhlie(int commandId);

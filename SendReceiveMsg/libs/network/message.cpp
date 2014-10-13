@@ -7,7 +7,7 @@
 
 
 Message::Message():data(NULL){
-    
+   m_dataLength = 0; 
 }
 Message::~Message()
 {
@@ -17,9 +17,17 @@ Message::~Message()
 	}
 }
 
+void Message::setdatalength(int len)
+{
+	m_dataLength = len;
+}
+
 int Message::datalength()
 {
-    return SocketClient::bytesToInt(length)+13;
+	if (m_dataLength > 0)
+		return m_dataLength;
+	else
+		return SocketClient::bytesToInt(length)+13;
 //    int addr = length[3] & 0xFF;
 //    
 //    addr |= ((length[2] << 8) & 0xFF00);

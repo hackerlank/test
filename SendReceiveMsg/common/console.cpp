@@ -229,12 +229,14 @@ namespace console
 		{
 			m_pWin32Con->Output(CONSOLE_COLOR_DEFAULT, szTime);
 			m_pWin32Con->Output(CONSOLE_COLOR_DEFAULT, szTextBuffer);
+			m_pWin32Con->Output(CONSOLE_COLOR_DEFAULT, "\n");
 		}
 
 		if (m_pFileLog)
 		{
 			m_pFileLog->Output(szTime);
 			m_pFileLog->Output(szFormatString);
+			m_pFileLog->Output("\n");
 		}
 
 	}
@@ -262,14 +264,18 @@ namespace console
 
 		if (m_pWin32Con)
 		{
+			m_pWin32Con->Output(dwColor, "\n");
 			m_pWin32Con->Output(dwColor, szTime);
 			m_pWin32Con->Output(dwColor, szTextBuffer);
+			m_pWin32Con->Output(dwColor, "\n");
 		}
 
 		if (m_pFileLog)
 		{
+			m_pWin32Con->Output(dwColor, "\n");
 			m_pFileLog->Output(szTime);
 			m_pFileLog->Output(szTextBuffer);
+			m_pFileLog->Output("\n");
 		}
 	}
 }

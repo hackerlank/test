@@ -6,6 +6,8 @@
 #include "TestMsgClient.h"
 #include "TestMsgClientDlg.h"
 
+#include "command.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -87,6 +89,9 @@ BOOL CTestMsgClientApp::InitInstance()
 		delete pShellManager;
 	}
 
+
+	stNullUserCmd cmd;
+	cmd.byParam = 1234;
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。
 	return FALSE;

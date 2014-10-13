@@ -9,7 +9,13 @@
 #include "message.h"
 #include <errno.h>
 #include <signal.h>
-#include "CData.h"
+#include <iomanip>
+#include "SocketManager.h"
+#include "command.h"
+#include "console.h"
+
+
+//#include "CData.h"
 //CCDictionary* SocketClient::m_dictionary= cocos2d::CCDictionary::create();
 SocketClient::SocketClient(String host, int port, byte clientid,
                            byte serverid,MessageHandler* netImpl):
@@ -31,9 +37,11 @@ m_pHandler(netImpl)
 	this->m_clientId = clientid;
 	this->m_serverId = serverid;
 	
+	m_bThreadRecvCreatedGateway = false;
 	m_bThreadRecvCreated = false;
 	m_bThreadSendCreated = false;
     
+	m_IsGatewayIP = false;
     
     //    m_dictionary->retain();  //字典 存放 数据
     //    if(m_dictionary)
@@ -63,20 +71,20 @@ SocketClient::~SocketClient()
 	pthread_mutex_destroy(&m_sendqueue_mutex);
 	pthread_mutex_destroy(&m_thread_cond_mutex);
 	pthread_cond_destroy(&m_threadCond);
-    
-	
+
+
 	while (!m_receivedMessageQueue.empty()) {
 		Message* m = m_receivedMessageQueue.front();
 		m_receivedMessageQueue.pop();
 		SAFE_DELETE_ELEMENT(m);
 	}
-	
+
 	while (!m_sendMessageQueue.empty()) {
 		Message* m = m_sendMessageQueue.front();
 		m_sendMessageQueue.pop();
 		SAFE_DELETE_ELEMENT(m);
 	}
-	
+
     
 	//if( DEBUG) printf("SocketClient::~SocketClient(),%p,%s:%d\n",this,m_host.c_str(),m_iport);
     
@@ -160,22 +168,33 @@ Message* SocketClient::constructMessage(const char* data,int commandId)
     
     //    str.append(msg->HEAD0);
     printf("%d" ,msg->datalength());
-    msg->data = new char[msg->datalength()];
-    memcpy(msg->data+0,&msg->HEAD0,1);
-    memcpy(msg->data+1,&msg->HEAD1,1);
-    memcpy(msg->data+2,&msg->HEAD2,1);
-    memcpy(msg->data+3,&msg->HEAD3,1);
-    memcpy(msg->data+4,&msg->ProtoVersion,1);
-    memcpy(msg->data+5,&msg->serverVersion,4);
-    memcpy(msg->data+9,&msg->length,4);
-    memcpy(msg->data+13,&msg->commandId,4);
-    memcpy(msg->data+17,data,strlen(data));
+	msg->data = new char[msg->datalength()];
+	memcpy(msg->data+0,&msg->HEAD0,1);
+	memcpy(msg->data+1,&msg->HEAD1,1);
+	memcpy(msg->data+2,&msg->HEAD2,1);
+	memcpy(msg->data+3,&msg->HEAD3,1);
+	memcpy(msg->data+4,&msg->ProtoVersion,1);
+	memcpy(msg->data+5,&msg->serverVersion,4);
+	memcpy(msg->data+9,&msg->length,4);
+	memcpy(msg->data+13,&msg->commandId,4);
+	memcpy(msg->data+17,data,strlen(data));
     //memcpy(msg->data+position,bytes+offset,len);
     //msg->data = data;
 	return msg;
 }
 
+Message* SocketClient::constructZtMessage(const char* data, int sendsize)
+{
+	Message* msg = new Message();
+	
+	msg->setdatalength(sendsize);
 
+	msg->data = new char[msg->datalength()];
+
+	memcpy(msg->data,data,sendsize);
+
+	return msg;
+}
 
 
 void SocketClient:: stop(boolean b){
@@ -190,11 +209,58 @@ void SocketClient:: stop(boolean b){
 	pthread_join(pthread_t_send, NULL);
 }
 
+void SocketClient::Destroy()
+{
+//	m_iState = SocketClient_DESTROY;
+	if( m_hSocket!=-1)
+#ifdef CC_PLATFORM_WIN32
+		closesocket(m_hSocket);
+#else
+		close(m_hSocket);
+#endif
+// 	pthread_mutex_destroy(&m_sendqueue_mutex);
+// 	pthread_mutex_destroy(&m_thread_cond_mutex);
+// 	pthread_cond_destroy(&m_threadCond);
 
+
+	while (!m_receivedMessageQueue.empty()) {
+		Message* m = m_receivedMessageQueue.front();
+		m_receivedMessageQueue.pop();
+		SAFE_DELETE_ELEMENT(m);
+	}
+
+	while (!m_sendMessageQueue.empty()) {
+		Message* m = m_sendMessageQueue.front();
+		m_sendMessageQueue.pop();
+		SAFE_DELETE_ELEMENT(m);
+	}
+}
+
+void SocketClient::ReConnect(String host, int port)
+{
+	m_IsGatewayIP = true;
+	m_iState = SocketClient_WAIT_CONNECT;
+	m_cbRecvBuf.clear();
+	m_cbSendBuf.clear();
+
+	memset(m_sabcde, 0, 6*8);
+
+// 	pthread_mutex_init (&m_sendqueue_mutex,NULL);
+// 	pthread_mutex_init(&m_thread_cond_mutex,NULL);
+// 	pthread_cond_init(&m_threadCond, NULL);
+
+	m_hSocket = -1;
+
+	this->m_host = host;
+	this->m_iport = port;
+
+	connectServer();
+}
 
 bool SocketClient::connectServer()
 {
     
+	ConsoleOutEx(console::CONSOLE_COLOR_YELLOW, "=====cconnectServer！=====");
 	if( m_host.length() < 1 || m_iport == 0) return false;
     //	if( DEBUG){
     //		printf("[SocketClient::Connect()] [ host:%s,port:%d ] \n",m_host.c_str(),m_iport);
@@ -269,17 +335,72 @@ bool SocketClient::connectServer()
     
 	
 	if( !m_bThreadRecvCreated ){
-        
+
 		if(pthread_create( &pthread_t_receive, NULL,ThreadReceiveMessage, this)!=0)
 			return false;
 		m_bThreadRecvCreated = true;
 	}
-    
+
+//  	if (!m_bThreadRecvCreatedGateway && m_IsGatewayIP)
+//  	{
+//  		if(pthread_create( &pthread_t_receive_gateway, NULL,ThreadReceiveMessageGateway, this)!=0)
+//  			return false;
+//  		m_bThreadRecvCreatedGateway = true;
+//  	}
+
 	m_iState = SocketClient_OK;
 	
 	
 	
     //if( DEBUG)	printf("socket connected success[ %s,%d],%p ,%d,%d \n",m_host.c_str(),m_iport, this,m_iState,SocketClient_OK);
+	
+	if (m_IsGatewayIP) //游戏网关
+	{
+		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "=====connect gateway successed！=====");
+
+		//设置加密的key
+// 		stServerReturnLoginSuccessCmd* pCmd = SocketManager::getInstance()->GetUserInfoCmd();
+// 		BYTE* pKeyData = &pCmd->key[pCmd->keyOffset];
+// 		SocketManager::getInstance()->m_key.clear();
+// 		for (int i=0; i<8; ++i)
+// 		{
+// 			SocketManager::getInstance()->m_key.push_back(pKeyData[i]);
+// 		}
+// 		SocketManager::getInstance()->m_dwEncryptMask = DWORD(pKeyData[2]);
+
+		//发送游戏版本号
+		stUserVerifyVerCmd cmd;
+		cmd.version = 2014092901;
+		SEND_USER_CMD(cmd);
+
+		//=================================================
+		
+
+// 		stPasswdLogonUserCmd cmd1;
+// 		cmd1.dwUserID = pCmd->dwUserID;
+// 		cmd1.loginTempID = pCmd->loginTempID;
+// 		strncpy(cmd1.pstrName, "goodluck03@gmail.com", sizeof(cmd1.pstrName));
+// 		cmd1.pstrName[sizeof(cmd1.pstrName) - 1] = 0;
+// 		strncpy(cmd1.pstrPassword, "", sizeof(cmd1.pstrPassword));
+// 		cmd1.pstrPassword[sizeof(cmd1.pstrPassword) - 1] = 0;
+// 
+// 		SEND_USER_CMD(cmd1);
+
+	}
+	else //登陆服务器
+	{
+		//////////////////////////////////////////////////////////////////////////
+		//连上登陆服务器后发送后续验证消息
+		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "=====connect loginserver successed！=====");
+
+		stUserVerifyVerCmd cmd;
+		cmd.version = 2014092901;
+		SEND_USER_CMD(cmd);
+
+		stRequestClientIP cmd1;
+		SEND_USER_CMD(cmd1);
+	}
+
 	
 	return true;
 }
@@ -371,8 +492,8 @@ void* SocketClient::ThreadSendMessage(void *p){
                     msg = This->m_sendMessageQueue.front();
                     This->m_sendMessageQueue.pop();
                 }
-                
-                printf(" sendData length: %d  %ld" ,  msg->datalength(), sizeof(char));
+
+                printf(" sendData length: %d  %ld\n" ,  msg->datalength(), sizeof(char));
                 if(msg->datalength() + sendBuff.getPosition() > sendBuff.getLimit()){
                     This->m_iState = SocketClient_DESTROY;
                     printf("send buffer is full, send thread stop!");
@@ -382,6 +503,15 @@ void* SocketClient::ThreadSendMessage(void *p){
                 }
                 //			printf("send message %0x \n",msg->type);
                 sendBuff.put(msg->data,0,msg->datalength());
+
+				for (int i=0; i<msg->datalength(); ++i)
+				{
+					cout << setfill('0') << setw(3) << (int)(msg->data[i]) << " ";
+					if ((i+1) % 20 == 0)
+						cout << endl;
+				}
+				cout << endl;
+				
                 //            sendBuff.put(&msg, 0, msg->datalength());
                 sendBuff.flip();
                 int ret = send(socket,(char *)sendBuff.getBuffer(),sendBuff.getLimit(),0);
@@ -422,8 +552,196 @@ void* SocketClient::ThreadSendMessage(void *p){
 	return (void*)0;
 }
 bool g_bcheckReceivedMessage = true;
+void* SocketClient::ThreadReceiveMessageGateway(void *p)
+{
+	static DWORD time = timeGetTime();
+	bool bPrintDebugInfo = false;
+	if (timeGetTime() > time + 1000)
+	{
+		bPrintDebugInfo = true;
+		time = timeGetTime();
+		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "============ThreadReceiveMessageGateway()！==============");
+	}
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+	MSAutoReleasePool POOL;
+#endif
+	fd_set fdRead;
+
+	struct timeval	aTime;
+	aTime.tv_sec = 1;
+	aTime.tv_usec = 0;
+
+	//最大多少秒，连接上收不到数据就提示用户，重新登录
+	int maxIdleTimeInSeconds = 60*3;
+
+	//最大多少秒，连接上收不到数据就提示用户，选择重连
+	int hint2TimeInSeconds = 60;
+
+
+	//多长时间没有收到任何数据，提示用户
+	int hintTimeInSeconds = 30;
+
+	struct timeval lastHintUserTime;
+	struct timeval lastReceiveDataTime;
+	struct timeval now;
+
+	gettimeofday(&lastReceiveDataTime, NULL);
+	lastHintUserTime = lastReceiveDataTime;
+
+	SocketClient* This = static_cast<SocketClient*>(p) ;
+
+	ByteBuffer* recvBuff = &This->m_cbRecvBuf;
+
+	while (This->m_iState != SocketClient_DESTROY)
+	{
+
+		//        CCLog("hahahahahahahhahahahahahahahha");
+		if( This->m_iState != SocketClient_OK){
+#ifdef CC_PLATFORM_WIN32
+			Sleep(1000);
+#else
+			usleep(1000);
+#endif
+			continue;
+		}
+		FD_ZERO(&fdRead);
+
+		FD_SET(This->m_hSocket,&fdRead);
+
+		aTime.tv_sec = 1;
+		aTime.tv_usec = 0;
+
+		//		int ret = select(This->m_hSocket+1,&fdRead,NULL,NULL,NULL);
+		int ret = select(This->m_hSocket+1,&fdRead,NULL,NULL,&aTime);
+
+		if (ret == -1 )
+		{
+			if(errno == EINTR){
+				printf("======   收到中断信号，什么都不处理＝＝＝＝＝＝＝＝＝");
+			}else{
+				This->m_iState = SocketClient_DESTROY;
+				//				if(DEBUG)printf("select error, receive thread stop! errno=%d, address=%p\n",errno,This);
+				MyLock lock(&This->m_sendqueue_mutex);
+				This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_CONNECT_TERMINATE,errno,"连接异常中断"));
+				return ((void *)0);
+			}
+		}
+		else if(ret==0)
+		{
+			//			printf("selector timeout . continue select.... \n");
+			gettimeofday(&now, NULL);
+			if( g_bcheckReceivedMessage ){
+				if(now.tv_sec - lastReceiveDataTime.tv_sec > maxIdleTimeInSeconds && now.tv_sec - lastHintUserTime.tv_sec > hintTimeInSeconds){
+					lastHintUserTime = now;
+
+					MyLock lock(&This->m_sendqueue_mutex);
+
+					while( This->m_receivedMessageQueue.size()>0){
+						Message* msg = This->m_receivedMessageQueue.front();
+						This->m_receivedMessageQueue.pop();
+						CCLog("删除消息");
+						delete msg;
+					}
+					This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_RECONNECT_FORCE,0,"您的网络已经出问题了！"));
+
+				}else if(now.tv_sec - lastReceiveDataTime.tv_sec > hint2TimeInSeconds && now.tv_sec - lastHintUserTime.tv_sec > hintTimeInSeconds){
+					lastHintUserTime = now;
+					MyLock lock(&This->m_sendqueue_mutex);
+					This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_RECONNECT_HINT,0,"您的网络好像出问题了！"));
+				}else if(now.tv_sec - lastReceiveDataTime.tv_sec > hintTimeInSeconds && now.tv_sec - lastHintUserTime.tv_sec > hintTimeInSeconds){
+					lastHintUserTime = now;
+					MyLock lock(&This->m_sendqueue_mutex);
+					This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_IDLE_TIMEOUT,0,"您的网络好像出问题了！"));
+				}
+			}else{
+				lastHintUserTime = now;
+				lastReceiveDataTime= now;
+			}
+		}
+		else if (ret > 0)
+		{
+			if (bPrintDebugInfo)
+			{
+				ConsoleOutEx(console::CONSOLE_COLOR_RED, "else if (ret > 0)");
+			}
+			if (FD_ISSET(This->m_hSocket,&fdRead))
+			{
+				if (bPrintDebugInfo)
+				{
+					ConsoleOutEx(console::CONSOLE_COLOR_PURPLE, "if (FD_ISSET(This->m_hSocket,&fdRead))");
+				}
+				int iRetCode = 0;
+				//printf(" recv data %d \n", recvBuff->remaining());
+				//if(recvBuff->remaining() > 0){
+				//	iRetCode = recv(This->m_hSocket,recvBuff->getBuffer()+recvBuff->getPosition(),
+				//                    recvBuff->remaining(),0);
+
+				char buffer[1024 * 10];
+				iRetCode = recv(This->m_hSocket, buffer, sizeof(buffer),0);
+				//}
+
+				//printf(" recv data later  %d   %d \n", recvBuff->remaining(), iRetCode);
+				if (iRetCode == -1)
+				{
+					This->m_iState = SocketClient_DESTROY;
+					MyLock lock(&This->m_sendqueue_mutex);
+
+					while( This->m_receivedMessageQueue.size()>0){
+						Message* msg = This->m_receivedMessageQueue.front();
+						This->m_receivedMessageQueue.pop();
+						CCLog("删除消息");
+						delete msg;
+					}
+
+					string tmp("网络连接中断！");
+					//					char* stre = strerror(errno);
+					//					if( stre!=NULL){
+					//						tmp.append(stre);
+					//					}
+					This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_CONNECT_TERMINATE,errno,tmp));
+					return ((void *)0);
+				}else if(iRetCode == 0 && recvBuff->remaining() > 0){
+					This->m_iState = SocketClient_DESTROY;
+					//					if(DEBUG)printf("server closed connection, receive thread stop %p!\n",This);
+					MyLock lock(&This->m_sendqueue_mutex);
+					while( This->m_receivedMessageQueue.size()>0){
+						Message* msg = This->m_receivedMessageQueue.front();
+						This->m_receivedMessageQueue.pop();
+						CCLog("删除消息");
+						delete msg;
+					}
+					This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_SERVER_CLOSE_CONNECTION,errno,"服务器主动关闭连接!"));
+
+					return ((void *)0);
+				}
+				else if(iRetCode > 0)
+				{
+					SocketManager::getInstance()->onRecvData((BYTE*)buffer, iRetCode);
+				}
+
+
+			}//end read
+		}
+
+
+	}
+
+
+	return (void*)0;
+}
+
 void* SocketClient::ThreadReceiveMessage(void *p)
 {
+	static DWORD time = timeGetTime();
+	bool bPrintDebugInfo = false;
+	if (timeGetTime() > time + 1000)
+	{
+		bPrintDebugInfo = true;
+		time = timeGetTime();
+		ConsoleOutEx(console::CONSOLE_COLOR_GREEN, "\n========ThreadReceiveMessage()！===========");
+	}
+
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 	MSAutoReleasePool POOL;
 #endif
@@ -522,16 +840,27 @@ void* SocketClient::ThreadReceiveMessage(void *p)
 		}
 		else if (ret > 0)
 		{
+			if (bPrintDebugInfo)
+			{
+				ConsoleOutEx(console::CONSOLE_COLOR_PURPLE, "\nelse if (ret > 0)");
+			}
 			if (FD_ISSET(This->m_hSocket,&fdRead))
 			{
-				int iRetCode = 0;
-                printf(" recv data %d \n", recvBuff->remaining());
-				if(recvBuff->remaining() > 0){
-					iRetCode = recv(This->m_hSocket,recvBuff->getBuffer()+recvBuff->getPosition(),
-                                    recvBuff->remaining(),0);
+				if (bPrintDebugInfo)
+				{
+					ConsoleOutEx(console::CONSOLE_COLOR_PURPLE, "\nif (FD_ISSET(This->m_hSocket,&fdRead)");
 				}
+				int iRetCode = 0;
+                //printf(" recv data %d \n", recvBuff->remaining());
+				//if(recvBuff->remaining() > 0){
+				//	iRetCode = recv(This->m_hSocket,recvBuff->getBuffer()+recvBuff->getPosition(),
+                //                    recvBuff->remaining(),0);
+
+				char buffer[1024 * 10];
+				iRetCode = recv(This->m_hSocket, buffer, sizeof(buffer),0);
+				//}
                 
-                printf(" recv data later  %d   %d \n", recvBuff->remaining(), iRetCode);
+                //printf(" recv data later  %d   %d \n", recvBuff->remaining(), iRetCode);
 				if (iRetCode == -1)
 				{
 					This->m_iState = SocketClient_DESTROY;
@@ -565,78 +894,81 @@ void* SocketClient::ThreadReceiveMessage(void *p)
 					
 					return ((void *)0);
 				}
-				else
+				else if(iRetCode > 0)
 				{
-					gettimeofday(&lastReceiveDataTime, NULL);
-					
-					recvBuff->setPosition(recvBuff->getPosition()+ iRetCode);
-					recvBuff->flip();
-					int tmpOffset = 17;
-					while(recvBuff->remaining() > tmpOffset){
-						int pos = recvBuff->position;
-						int length= recvBuff->getLength(9);
-						
-						if(recvBuff->remaining()+tmpOffset >= length){
-
-							Message* message = new Message();
-  
-                            message->HEAD0 = recvBuff->getByte();
-                            message->HEAD1 = recvBuff->getByte();
-                            message->HEAD2 = recvBuff->getByte();
-                            message->HEAD3 = recvBuff->getByte();
-                            message->ProtoVersion = recvBuff->getByte();
-                            recvBuff->getAsBytes(message->serverVersion);
-                            recvBuff->getAsBytes(message->length);
-                            recvBuff->getAsBytes(message->commandId);
-                            
-							printf("message length: %d commandId: %d \n", bytesToInt(message->length),bytesToInt(message->commandId));
-                            
-							char* tmp = new char[length-3];
-							recvBuff->get(tmp,0,length-4);
-                            tmp[length-4] = '\0';
-                            message->data = tmp;
-					
-                                
-                                MyLock lock(&This->m_sendqueue_mutex);
-
-                                This->m_receivedMessageQueue.push(message);
-                                CCLog("接收队列长度:::: %d",sizeof(This->m_receivedMessageQueue));
-                                
-                                CCLog("%d-----------------",This->m_receivedMessageQueue.size());
-                                
-                                CCLog("%d",bytesToInt(message->commandId));
-                                if(bytesToInt(message->commandId)==218){
-                                    CData::getCData()->m_newlevel_dic->setObject(message, 218);
-                                }
-                                else{
-                                    CData::getCData()->m_dictionary->setObject(message,bytesToInt(message->commandId));
-                                    
-                                }
-							
-                            
-						}else if(length>recvBuff->getCapacity()){
-							This->m_iState = SocketClient_DESTROY;
-                          
-							MyLock lock(&This->m_sendqueue_mutex);
-							
-							while( This->m_receivedMessageQueue.size()>0){
-								Message* msg = This->m_receivedMessageQueue.front();
-								This->m_receivedMessageQueue.pop();
-                                CCLog("删除消息");
-								delete msg;
-							}
-							
-							This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_CONNECT_TERMINATE,0,"数据包太大，连接中断！"));
-							return ((void *)0);
-						}else {
-							//printf("----------------------------\n");
-							recvBuff->position = pos;
-							break;
-						}
-					}
-					//
-					recvBuff->compact();
+					SocketManager::getInstance()->onRecvData((BYTE*)buffer, iRetCode);
 				}
+// 				{
+// 					gettimeofday(&lastReceiveDataTime, NULL);
+// 					
+// 					recvBuff->setPosition(recvBuff->getPosition()+ iRetCode);
+// 					recvBuff->flip();
+// 					int tmpOffset = 17;
+// 					while(recvBuff->remaining() > tmpOffset){
+// 						int pos = recvBuff->position;
+// 						int length= recvBuff->getLength(9);
+// 						
+// 						if(recvBuff->remaining()+tmpOffset >= length){
+// 
+// 							Message* message = new Message();
+//   
+//                             message->HEAD0 = recvBuff->getByte();
+//                             message->HEAD1 = recvBuff->getByte();
+//                             message->HEAD2 = recvBuff->getByte();
+//                             message->HEAD3 = recvBuff->getByte();
+//                             message->ProtoVersion = recvBuff->getByte();
+//                             recvBuff->getAsBytes(message->serverVersion);
+//                             recvBuff->getAsBytes(message->length);
+//                             recvBuff->getAsBytes(message->commandId);
+//                             
+// 							printf("message length: %d commandId: %d \n", bytesToInt(message->length),bytesToInt(message->commandId));
+//                             
+// 							char* tmp = new char[length-3];
+// 							recvBuff->get(tmp,0,length-4);
+//                             tmp[length-4] = '\0';
+//                             message->data = tmp;
+// 					
+//                                 
+//                                 MyLock lock(&This->m_sendqueue_mutex);
+// 
+//                                 This->m_receivedMessageQueue.push(message);
+//                                 CCLog("接收队列长度:::: %d",sizeof(This->m_receivedMessageQueue));
+//                                 
+//                                 CCLog("%d-----------------",This->m_receivedMessageQueue.size());
+//                                 
+//                                 CCLog("%d",bytesToInt(message->commandId));
+// //                                 if(bytesToInt(message->commandId)==218){
+// //                                     CData::getCData()->m_newlevel_dic->setObject(message, 218);
+// //                                 }
+// //                                 else{
+// //                                     CData::getCData()->m_dictionary->setObject(message,bytesToInt(message->commandId));
+// //                                    
+// //                                }
+// 							
+//                             
+// 						}else if(length>recvBuff->getCapacity()){
+// 							This->m_iState = SocketClient_DESTROY;
+//                           
+// 							MyLock lock(&This->m_sendqueue_mutex);
+// 							
+// 							while( This->m_receivedMessageQueue.size()>0){
+// 								Message* msg = This->m_receivedMessageQueue.front();
+// 								This->m_receivedMessageQueue.pop();
+//                                 CCLog("删除消息");
+// 								delete msg;
+// 							}
+// 							
+// 							This->m_receivedMessageQueue.push(constructErrorMessage(TYPE_SELF_DEINE_MESSAGE_CONNECT_TERMINATE,0,"数据包太大，连接中断！"));
+// 							return ((void *)0);
+// 						}else {
+// 							//printf("----------------------------\n");
+// 							recvBuff->position = pos;
+// 							break;
+// 						}
+// 					}
+// 					//
+// 					recvBuff->compact();
+// 				}
 				
 			}//end read
 		}
@@ -703,6 +1035,7 @@ void SocketClient::swhlie(int commandId)
     
     
 }
+
 
 
 

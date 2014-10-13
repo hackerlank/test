@@ -7,8 +7,18 @@
 #include "TestMsgClientDlg.h"
 #include "afxdialogex.h"
 
-#include "../common/console.h"
+#include "command.h"
+
+#include "console.h"
 #include <iostream>
+#include<iomanip>
+
+// #include "json.h"
+// #include "SocketClient.h"
+// #include "message.h"
+// #include "MessageQueue.h"
+ #include "SocketManager.h"#include <string>
+
 
 using namespace std;
 
@@ -16,7 +26,6 @@ using namespace std;
 #define new DEBUG_NEW
 #endif
 
-#pragma comment(lib, "WS2_32.lib")
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -57,70 +66,92 @@ END_MESSAGE_MAP()
 
 CTestMsgClientDlg::CTestMsgClientDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestMsgClientDlg::IDD, pParent)
+	, m_sendTxt(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_sock = 0;
 }
 
 void CTestMsgClientDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_EDIT1, m_sendTxt);
+	DDX_Control(pDX, IDC_EDIT1, m_editCtrol);
 }
 
 int CTestMsgClientDlg::InitNetWork()
 {
-	WSADATA wsaData;  
-	WORD sockVersion = MAKEWORD(2, 2);  
-	SOCKET sock = 0;  
+	SocketManager::getInstance()->startSocket();
 
-	if (WSAStartup(sockVersion, &wsaData) != 0)  
-	{  
-		cout << "initlization failed!" << endl;  
-		exit(0);  
-	}  
+	return 0;
 
-	sock = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);  
+// 	WSADATA wsaData;  
+// 	WORD sockVersion = MAKEWORD(2, 2);  
+// 	SOCKET sock = 0;  
+// 
+// 	if (WSAStartup(sockVersion, &wsaData) != 0)  
+// 	{  
+// 		cout << "initlization failed!" << endl;  
+// 		exit(0);  
+// 	}  
+// 
+// 	sock = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);  
+// 
+// 	if (sock == INVALID_SOCKET)  
+// 	{  
+// 		cout << "failed socket!" << endl;  
+// 
+// 		return 0;  
+// 	}  
+// 
+// 	sockaddr_in sin;  
+// 
+// 	sin.sin_family = AF_INET;   
+// 	sin.sin_port = htons(4567);  
+// 	sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");  
+// 
+// 	if (connect(sock, (sockaddr*)&sin, sizeof(sockaddr)) == -1)  
+// 	{  
+// 		cout << "connect failed!" << endl;  
+// 
+// 		return 0;  
+// 	}  
+// 
+// 	char buffer[256] = "\0";  
+// 	int  nRecv = 0;  
+// 
+// 	nRecv = recv(sock, buffer, 256, 0);  
+// 
+// 	if (nRecv > 0)  
+// 	{  
+// 		buffer[nRecv] = '\0';  
+// 
+// 		cout << "reveive data: " << buffer << endl;  
+// 
+// 		m_sock = sock;
+// 	}  
 
-	if (sock == INVALID_SOCKET)  
-	{  
-		cout << "failed socket!" << endl;  
+ 
+}
 
-		return 0;  
-	}  
+int CTestMsgClientDlg::ReleaseNetWork()
+{
+	closesocket(m_sock);  
 
-	sockaddr_in sin;  
+	WSACleanup(); 
 
-	sin.sin_family = AF_INET;   
-	sin.sin_port = htons(4567);  
-	sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");  
-
-	if (connect(sock, (sockaddr*)&sin, sizeof(sockaddr)) == -1)  
-	{  
-		cout << "connect failed!" << endl;  
-
-		return 0;  
-	}  
-
-	char buffer[256] = "\0";  
-	int  nRecv = 0;  
-
-	nRecv = recv(sock, buffer, 256, 0);  
-
-	if (nRecv > 0)  
-	{  
-		buffer[nRecv] = '\0';  
-
-		cout << "reveive data: " << buffer << endl;  
-	}  
-
-	closesocket(sock);  
-
-	WSACleanup();  
+	return 0;
 }
 
 BEGIN_MESSAGE_MAP(CTestMsgClientDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CTestMsgClientDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDOK, &CTestMsgClientDlg::OnBnClickedOk)
+	ON_EN_CHANGE(IDC_EDIT1, &CTestMsgClientDlg::OnEnChangeEdit1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CTestMsgClientDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CTestMsgClientDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -215,3 +246,71 @@ HCURSOR CTestMsgClientDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CTestMsgClientDlg::OnBnClickedButton1()
+{
+	//	static int i = 0;
+
+	// 	GetDlgItemText(IDC_EDIT1,m_sendTxt);
+	// 	string rtMsg = avar("第%d次%s\n", ++i, (LPCTSTR)m_sendTxt);
+	// 	send(m_sock, rtMsg.c_str(), strlen(rtMsg.c_str()), 0); 
+
+	// 	Json::FastWriter  writer;
+	// 	Json::Value person;
+	// 	person["username"]="wumingsheng";
+	// 	person["password"]=12345678;
+	// 	std::string  json_file=writer.write(person);//192.168.1.210   114.252.70.61  183.60.243.195
+	// 	CCLog("%s",json_file.c_str());
+	// 	SocketManager::getInstance()->sendMessage(json_file.c_str(), 101);
+
+	//stUserRequestLoginCmd cmd;
+	//strcpy(cmd.pstrName, "goodluck02@gmail.com");
+	//	cmd.version = 1234;
+	//  	cmd.version = 20141015;
+	//SEND_USER_CMD(cmd);
+
+	//	SocketManager::getInstance()->send((char*)(&cmd), 10);
+
+
+	//连接登入服务器
+	SocketManager::getInstance()->startSocket();
+
+}
+
+
+void CTestMsgClientDlg::OnBnClickedOk()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CDialogEx::OnOK();
+	ReleaseNetWork();
+
+}
+
+
+void CTestMsgClientDlg::OnEnChangeEdit1()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+	//m_sendTxt = GetDlgItemText(IDC_EDIT1);
+}
+
+
+void CTestMsgClientDlg::OnBnClickedButton2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	stServerReturnLoginSuccessCmd cmd;
+	SEND_USER_CMD(cmd);
+}
+
+
+void CTestMsgClientDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	stUserRequestLoginCmd cmd;
+	SEND_USER_CMD(cmd);
+}

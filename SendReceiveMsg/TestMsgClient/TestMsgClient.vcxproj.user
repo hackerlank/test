@@ -4,5 +4,7 @@
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\libs\cocos2dx\platform\third_party\win32\libraries</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand />
   </PropertyGroup>
 </Project>

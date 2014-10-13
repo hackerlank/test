@@ -2,7 +2,7 @@
 #define MESSAGE_H
 
 #include "Util.h"
-#include "cocos2d.h"
+//#include "cocos2d.h"
 using namespace cocos2d;
 //¡¨Ω” ß∞‹
 static const unsigned int TYPE_SELF_DEINE_MESSAGE_CONNECT_FAIL = 0xfffffA01;
@@ -43,8 +43,8 @@ public:
       */
     char* data;
 	
-	
-	
+	void setdatalength(int len);
+	int m_dataLength;
 	
 	Message();
     int datalength();

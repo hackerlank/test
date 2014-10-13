@@ -16,6 +16,15 @@
     <Filter Include="common">
       <UniqueIdentifier>{f3751003-f00c-4730-8c62-b0dbe9873eb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="network">
+      <UniqueIdentifier>{7e250290-d5fe-407e-9ae0-b57164efcf8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="json">
+      <UniqueIdentifier>{f41639d1-3939-4eef-8c4a-aba58c48a723}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enc">
+      <UniqueIdentifier>{cad855f4-4b5b-4234-8398-15b0d60946a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -48,6 +57,39 @@
     <ClInclude Include="..\common\singleton.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\libs\enc\miniCrypt.h">
+      <Filter>enc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\enc\zEncDec.h">
+      <Filter>enc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\command.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\MSAutoReleasePool.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\SocketClient.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\SocketManager.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\Util.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\ByteBuffer.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\message.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\MessageHandler.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libs\network\MessageQueue.h">
+      <Filter>network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestMsgClient.cpp">
@@ -61,6 +103,39 @@
     </ClCompile>
     <ClCompile Include="..\common\console.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\network\Util.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\network\ByteBuffer.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\network\message.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\network\MessageQueue.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\network\SocketClient.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\network\SocketManager.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\json\src\lib_json\json_writer.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\json\src\lib_json\json_reader.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\json\src\lib_json\json_value.cpp">
+      <Filter>json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\enc\miniCrypt.c">
+      <Filter>enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libs\enc\zEncDec.cpp">
+      <Filter>enc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

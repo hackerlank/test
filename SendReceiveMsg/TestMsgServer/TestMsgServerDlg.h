@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <vector>
+
+#include "pthread.h"
 
 // CTestMsgServerDlg 对话框
 class CTestMsgServerDlg : public CDialogEx
@@ -20,6 +23,15 @@ public:
 
 	int InitNetWork();
 
+	pthread_t pthread_t_listen;
+	bool m_bThreadListenCreated;
+	pthread_t pthread_t_receive;
+	bool m_bThreadRecvCreated;
+
+	static void* ThreadListenClient(void *p);
+	static void* ThreadReceivetMsg(void *p);
+
+//	std::vector<SOCKET> m_vecClientSockets;
 // 实现
 protected:
 	HICON m_hIcon;
@@ -30,4 +42,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedButton1();
 };
