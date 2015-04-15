@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="gb2312"?>
+<MonsterCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monsters>
+    <Monster name="monster">
+      <Health>100</Health>
+    </Monster>
+    <Monster name="boss">
+      <Health>1000</Health>
+    </Monster>
+  </Monsters>
+</MonsterCollection>

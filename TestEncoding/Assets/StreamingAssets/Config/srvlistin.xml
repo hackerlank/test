@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2005 sp2 U (http://www.altova.com) by any (Ru-Board) -->
+<!--server gametype="1" 游戏类型: 1是免费版, 39是新征途， 20130617 是任何类型都可以用了。-->
+<server gametype="20130617">
+	<patch>
+		<!-- type: 1X: 电信 ; 2X: 网通 -->
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate1" type="10" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/quanquCo" type="23" btport="9300"/>
+	<!--	<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate5" type="11"/> -->
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate2" type="12" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate4" type="14" btport="9300"/>
+		<item addr="192.168.5.20" port="80" path="/Zhengtu/Client/QAUpdate" type="21" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/FreeZTQA6Co" type="26" btport="9300"/>
+		<!--item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate6" type="26" btport="9300"/-->
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate6" type="16" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate7" type="18" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate3" type="20" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate1_HP" type="620" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QAUpdate3_HP" type="722" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/CehuaClientCo" type="25" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/CehuaOldFreeZTClientCo" type="225" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/HPClientCo" type="17" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/weiduanCo" type="19" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QA6MiniCo" type="216" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/NEW2neiwangCo" type="218" btport="9300"/>
+		<item addr="172.17.15.2" port="80" path="/FreeWeiduanCo" type="117" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/NEW2DiffCo" type="211" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/NEW2Co" type="212" btport="9300"/>	
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/NEW2qianduanCo" type="416" btport="9300"/>	
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/NEW2houduanCo" type="418" btport="9300"/>	
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/D" type="256" btport="9300"/>
+		<item addr="222.73.192.4" port="80" path="/Zhengtu/Client/QAUpdate6" type="257" btport="9300" reservepatch="172.17.102.61" /> 
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/HSLJCo" type="226" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/WJXTCo" type="228" btport="9300"/>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/R4Co" type="229" btport="9300"/>
+		
+		
+	</patch>
+        <pServ>
+                <ping addr="192.168.5.20" pingsrv="1"/>
+								<ping addr="132.168.5.11" pingsrv="2"/>
+        </pServ>
+	
+	<version ver="20150227"/>
+	
+	<zones default="FreeQA6内网">
+		<zone name="FreeQA6内网" id="1382" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA6内网" id="1382" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>		
+		<zone name="QA6内网" id="1382" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA6外网单区" id="1382" addr="192.168.5.46" port="7000" type = "20" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA6外网单区" id="1382" addr="192.168.5.46" port="7000" type = "20" wdtype = "216" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA6外网全区" id="1382" addr="192.168.5.46" port="7000" type = "10" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA6外网全区" id="1382" addr="192.168.5.46" port="7000" type = "10" wdtype = "216" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA135内网" id="1381" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>		
+		<zone name="QA135外网单区" id="1381" addr="192.168.5.46" port="7000" type = "20" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA135外网全区" id="1381" addr="192.168.5.46" port="7000" type = "10" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA136内网" id="2282" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA136内网网通" id="2282" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="新区QA136内网" id="2282" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA136外网单区" id="2282" addr="192.168.5.46" port="7000" type = "20" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA136外网全区" id="2282" addr="192.168.5.46" port="7000" type = "10" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="三国版QA55" id="2239" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA135B内网" id="2299" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA135C内网" id="2295" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA135D内网" id="2400" addr="192.168.5.46" port="7000" type = "26" wdtype = "216" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA48段位赛" id="381" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA50段位赛2" id="2202" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA51段位赛3" id="430" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="Q52华山论剑全区赛事" id="409" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="Q52战场全区帮会夺城战" id="2301" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA55" id="429" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="盟战三区QA53" id="2274" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="0" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="QA测试服务器4(娱乐新区)" id="1384" addr="192.168.5.46" port="7000" type = "14" wdtype = "19" zone="0" Index="0" pingsrv="1"/>
+		<zone name="FreeZT44策划服务器" id="797" addr="192.168.5.46" port="7000" type = "225" wdtype = "19" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="FreeZT90策划服务器" id="2300" addr="192.168.5.46" port="7000" type = "225" wdtype = "19" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="肖昌辉20702" id="4040" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="肖昌辉20703" id="4064" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="王兆灿20706" id="4056" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="王兆灿20768" id="4033" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="洪孝强免费版" id="4039" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" Index="0" pingsrv="1"/>
+		<zone name="郜正双新免费版" id="4004" addr="192.168.5.46" port="7000" type = "16" wdtype = "19" zone="1" Index="0" pingsrv="1"/>
+		<zone name="郜正双10520" id="4049" addr="192.168.5.46" port="7000" type = "16" wdtype = "19" zone="1" Index="0" pingsrv="1"/>
+		<zone name="郜正双新新免费版" id="4031" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" Index="0" pingsrv="1"/>
+		<zone name="王坦新免费版" id="4010" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" Index="0" pingsrv="1"/>
+		<zone name="王坦新免费版4013" id="4013" addr="192.168.5.46" port="7000" type = "26" wdtype = "19" zone="1" Index="0" pingsrv="1"/>
+		<zone name="张育华免费版" id="4046" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="张育华30888" id="4043" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="张育华16666" id="4060" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="张育华16667" id="4061" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="张育华16668" id="4062" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="洪孝强战场版" id="4050" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="范北爽" id="4054" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="赵永乐" id="4057" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="刘清华" id="4058" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="朱玉涛" id="4029" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="杨建华" id="4036" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+		<zone name="樊鹏" id="4059" addr="192.168.5.46" port="7000" type = "26" zone="1" cr="255" cg="0" cb="0" bold="1" Index="0" pingsrv="1"/>
+	</zones>
+	<board>
+			<item show="1"  color="128,128,128" content ="紧急公告内容#于网络波动公告网页不能显示\r\n最新内容如下#1111111111111111111111111111\r\n\r\n\r\n#$#n33333333"/>
+    </board>		
+	<proxys>
+	  <proxy name="征途大本营（特殊通道。懂的呀）" ip="192.168.152.105" port="1080" /> 
+	  <proxy name="华东(电信)" ip="192.168.5.5" port="1080" /> 
+	  <proxy name="新疆(网通)" ip="192.168.5.6" port="1080" /> 
+	  <proxy name="上海(电信)" ip="192.168.5.7" port="1080" /> 
+	  <proxy name="上海1(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海2(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海3(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海4(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海5(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海6(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海7(网通)" ip="192.168.52.186" port="1080" /> 
+	  <proxy name="上海8(网通)" ip="192.168.52.186" port="1080" /> 
+	</proxys>
+	
+	<mini>
+		<item addr="172.17.102.61" port="80" path="/Zhengtu/Client/QA6MiniCo" weight="100"/>
+	</mini>
+</server>
