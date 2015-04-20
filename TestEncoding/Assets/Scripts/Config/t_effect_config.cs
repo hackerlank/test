@@ -1,32 +1,33 @@
-﻿using ProtoBuf;
 using System;
-
+using ProtoBuf;
+using System.Collections.Generic;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 [ProtoContract]
-public class t_effect_config
+public partial class t_effect_config
 {
+    [ProtoMember(127)]
+    public t_effect_config[] ProtoList;
+    [ProtoMember(1)]
+    public UInt32 m_id;
     [ProtoMember(2)]
     public string m_asset;
     [ProtoMember(3)]
     public string m_bind1;
-    [ProtoMember(6)]
-    public string m_bind2;
-    [ProtoMember(11)]
-    public string m_desc;
     [ProtoMember(4)]
-    public uint m_downloadLevel;
-    [ProtoMember(10)]
-    public float m_dura;
-    [ProtoMember(9)]
-    public int m_follow;
-    [ProtoMember(1)]
-    public uint m_id;
+    public UInt32 m_downloadLevel;
     [ProtoMember(5)]
     public string m_offset1;
+    [ProtoMember(6)]
+    public string m_bind2;
     [ProtoMember(7)]
     public string m_offset2;
     [ProtoMember(8)]
     public float m_scale;
-    [ProtoMember(0x7f)]
-    public t_effect_config[] ProtoList;
+    [ProtoMember(9)]
+    public Int32 m_follow;
+    [ProtoMember(10)]
+    public float m_dura;
+    [ProtoMember(11)]
+    public string m_desc;
+    public t_effect_config() { }
 }
-

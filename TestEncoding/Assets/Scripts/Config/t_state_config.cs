@@ -1,22 +1,23 @@
-﻿using ProtoBuf;
 using System;
-
+using ProtoBuf;
+using System.Collections.Generic;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 [ProtoContract]
-public class t_state_config
+public partial class t_state_config
 {
-    [ProtoMember(6)]
-    public string m_desc;
-    [ProtoMember(5)]
-    public uint m_effect;
-    [ProtoMember(4)]
-    public uint m_ico;
-    [ProtoMember(1)]
-    public uint m_id;
-    [ProtoMember(2)]
-    public string m_stateString;
-    [ProtoMember(3)]
-    public string m_title;
-    [ProtoMember(0x7f)]
+    [ProtoMember(127)]
     public t_state_config[] ProtoList;
+        [ProtoMember(1)]
+    public UInt32 m_id;
+        [ProtoMember(2)]
+    public string m_stateString;
+        [ProtoMember(3)]
+    public string m_title;
+        [ProtoMember(4)]
+    public UInt32 m_ico;
+        [ProtoMember(5)]
+    public UInt32 m_effect;
+        [ProtoMember(6)]
+    public string m_desc;
+    public t_state_config(){}
 }
-

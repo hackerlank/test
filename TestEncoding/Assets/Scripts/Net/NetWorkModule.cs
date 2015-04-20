@@ -1,123 +1,158 @@
-﻿namespace Net
+﻿using System.Net;
+using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Net
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Runtime.InteropServices;
-    using UnityEngine;
+    public delegate void OnMessageCallback(UMessage message);
 
     public class NetWorkModule : SingletonForMono<NetWorkModule>
     {
-        public Dictionary<ushort, ushort> BlockingMsgPair = new Dictionary<ushort, ushort>();
-        public Dictionary<ushort, OnMessageCallback> CallbackDict = new Dictionary<ushort, OnMessageCallback>();
+
         public USocket MainSocket;
         private OnSocketCallback onConnect;
         private OnSocketCallback onConnectFail;
 
-        public void BeginCacheMsg()
-        {
-            Debug.Log("BeginCacheMsg");
-            this.MainSocket.BeginCacheMsg();
-        }
+        public Dictionary<UInt16, OnMessageCallback> CallbackDict = new Dictionary<UInt16, OnMessageCallback>();        //MsgID回调键值对
 
+        public Dictionary<UInt16, UInt16> BlockingMsgPair = new Dictionary<UInt16, UInt16>();                   //阻塞消息键值对 request-response
+
+        /// <summary>
+        /// 连接服务器
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="type"></param>
+        /// <param name="onConnect"></param>
+        /// <param name="onConnectFail"></param>
         public void Connect(IPEndPoint ipEndPoint, USocketType type, OnSocketCallback onConnect, OnSocketCallback onConnectFail)
         {
             this.onConnect = onConnect;
             this.onConnectFail = onConnectFail;
-            if (this.MainSocket != null)
+
+            if (MainSocket != null)
             {
-                this.MainSocket.Dispose();
-                this.MainSocket = null;
+                MainSocket.Dispose();
+                MainSocket = null;
             }
-            this.MainSocket = new USocket(type);
-            this.MainSocket.Connect(ipEndPoint, new OnSocketCallback(this.onSocketConnect), new OnSocketCallback(this.onSocketConnectFail), new OnSocketCallback(this.onSocketClose), null);
+            MainSocket = new USocket(type);
+            MainSocket.Connect(ipEndPoint, onSocketConnect, onSocketConnectFail, onSocketClose);
         }
 
-        public void DeRegisterMsg(ushort cmdId)
+        /// <summary>
+        /// 注册消息回调
+        /// </summary>
+        /// <param name="cmdId"></param>
+        /// <param name="Callback"></param>
+        public void RegisterMsg(UInt16 cmdId, OnMessageCallback Callback)
         {
-            if (this.CallbackDict.ContainsKey(cmdId))
+            if (!CallbackDict.ContainsKey(cmdId))
             {
-                this.CallbackDict.Remove(cmdId);
-            }
-        }
-
-        public void FinishCacheMsg()
-        {
-            Debug.Log("FinishCacheMsg");
-            this.MainSocket.FinishCacheMsg();
-        }
-
-        private void OnDestroy()
-        {
-            if (this.MainSocket != null)
-            {
-                this.MainSocket.Dispose();
-                Debug.Log("Dispose");
+                CallbackDict[cmdId] = Callback;
             }
         }
-
-        public void onDisConnected()
+        /// <summary>
+        /// 取消注册
+        /// </summary>
+        /// <param name="cmdId"></param>
+        /// <param name="Callback"></param>
+        public void DeRegisterMsg(UInt16 cmdId)
         {
-        }
-
-        private void onSocketClose()
-        {
-        }
-
-        private void onSocketConnect()
-        {
-            if (this.onConnect != null)
+            if (CallbackDict.ContainsKey(cmdId))
             {
-                this.onConnect();
+                CallbackDict.Remove(cmdId);
             }
         }
 
-        private void onSocketConnectFail()
+        /// <summary>
+        /// 注册阻塞消息 RequestID-ResponseID
+        /// </summary>
+        /// <param name="requestID"></param>
+        /// <param name="responseID"></param>
+        public void RegisterBlockingMsg(UInt16 requestID, UInt16 responseID)
         {
-            if (this.onConnectFail != null)
+            if (!BlockingMsgPair.ContainsKey(requestID))
             {
-                this.onConnectFail();
+                BlockingMsgPair[requestID] = responseID;
             }
         }
 
-        public void RegisterBlockingMsg(ushort requestID, ushort responseID)
+        public void Send(UMessage message,bool isToSelf = false)
         {
-            if (!this.BlockingMsgPair.ContainsKey(requestID))
+            if (MainSocket != null)
             {
-                this.BlockingMsgPair[requestID] = responseID;
-            }
-        }
-
-        public void RegisterMsg(ushort cmdId, OnMessageCallback Callback)
-        {
-            if (!this.CallbackDict.ContainsKey(cmdId))
-            {
-                this.CallbackDict[cmdId] = Callback;
-            }
-        }
-
-        public void Send(UMessage message, bool isToSelf = false)
-        {
-            if (this.MainSocket != null)
-            {
-                this.MainSocket.Send(message, isToSelf);
+                MainSocket.Send(message, isToSelf);
             }
         }
 
         public void SendImmediate(UMessage msg)
         {
-            if (this.MainSocket != null)
+            if (MainSocket != null)
             {
-                this.MainSocket.SendImmediate(msg);
+                MainSocket.SendImmediate(msg);
             }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void BeginCacheMsg()
+        {
+            Debug.Log("BeginCacheMsg");
+            Util.Log("@@BeginCacheMsg");
+            MainSocket.BeginCacheMsg();
+        }
+
+        public void FinishCacheMsg()
+        {
+            Debug.Log("FinishCacheMsg");
+            Util.Log("@@FinishCacheMsg");
+            MainSocket.FinishCacheMsg();
+        }
+        
+        private void onSocketConnect()
+        {
+            if (onConnect != null)
+            {
+                onConnect();
+            }
+        }
+
+        private void onSocketConnectFail()
+        {
+            if (onConnectFail != null)
+            {
+                onConnectFail();
+            }
+        }
+
+        private void onSocketClose()
+        {
+
+        }
+
+        public void onDisConnected()
+        {
+ 
         }
 
         public void Update()
         {
-            if (this.MainSocket != null)
+            if (MainSocket != null)
             {
-                this.MainSocket.MsgqueueManager();
+                MainSocket.MsgqueueManager();
             }
+        }
+
+        void OnDestroy()
+        {
+            if(MainSocket == null)
+            {
+                return;
+            }
+            MainSocket.Dispose();
+            Debug.Log("Dispose");
         }
     }
 }

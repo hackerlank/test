@@ -1,0 +1,18 @@
+﻿////////////////////////////////////////////////////////////////////////////////
+//  
+// @module Affter Effect Importer
+// @author Osipov Stanislav lacost.st@gmail.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
+using UnityEngine;
+using System.Collections;
+
+public enum AELayerBlendingType {
+
+	NORMAL,
+	ADD,
+    LIGHTEN,
+    SCREEN,
+    MULTIPLY,
+}
